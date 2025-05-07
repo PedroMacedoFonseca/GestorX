@@ -11,46 +11,29 @@ namespace Projeto1
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            try
+            if (!IsPostBack)
             {
-                if (!IsPostBack && IsAjaxRequest())
+                string idParam = Request.QueryString["edit"];
+                int parsedId; 
+
+                if (!string.IsNullOrEmpty(idParam) && int.TryParse(idParam, out parsedId))
                 {
-                    Response.Clear();
-                    Response.ContentType = "text/html";
 
-                    string id = Request.QueryString["edit"];
-                    bool isEdicao = !string.IsNullOrEmpty(id);
-
-                    Response.Write(
-                        $"<script>window.parent.$('#modalTitle').text('{(isEdicao ? "Editar Usuário" : "Novo Usuário")}');</script>"
-                    );
-
-                    if (isEdicao)
-                    {
-                        CarregarUsuarioParaEdicao(Convert.ToInt32(id));
-                    }
-
-                    Response.Flush();
-                    return;
+                    CarregarUsuarioParaEdicao(parsedId);                                       
+                    divSenha.Visible = false;
+                    rfvSenha.Enabled = false;
+                }
+                else
+                {
+                    hfID.Value = "0";
+                    divSenha.Visible = true;
+                    rfvSenha.Enabled = true;
                 }
             }
-            catch (Exception ex)
-            {
-                Response.Write($"<script>console.error('Erro: {ex.Message}');</script>");
-                Response.Flush();
-                return;
-            }
-        }
-
-        private bool IsAjaxRequest()
-        {
-            return Request.Headers["X-Requested-With"] == "XMLHttpRequest";
         }
 
         private void CarregarUsuarioParaEdicao(int id)
         {
-            try
-            {
                 UsuarioDAL dal = new UsuarioDAL();
                 Usuario usuario = dal.ObterPorId(id);
 
@@ -62,74 +45,83 @@ namespace Projeto1
                     txtMatricula.Text = usuario.Matricula;
                     txtTelefone.Text = usuario.Telefone;
                     txtUnidade.Text = usuario.Unidade;
-                    ddlPerfil.SelectedValue = usuario.Perfil;
+                    if (ddlPerfil.Items.FindByValue(usuario.Perfil) != null)
+                    {
+                        ddlPerfil.SelectedValue = usuario.Perfil;
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Response.Clear();
-                Response.Write($"<div class='alert alert-danger'>Erro ao carregar usuário: {ex.Message}</div>");
-                Response.Flush();
-                return;
-            }
+                else
+                {
+                    ClientScript.RegisterStartupScript(this.GetType(), "UserNotFound", "alert('Usuário não encontrado.'); window.parent.$('#modalCadastro').modal('hide');", true);
+                }
         }
-
+    
         protected void btnSalvar_Click(object sender, EventArgs e)
         {
             try
             {
-                Page.Validate();
-                if (!Page.IsValid) return;
-
-                if (IsValid)
+                if (!Page.IsValid)
                 {
-                    UsuarioDAL dal = new UsuarioDAL();
-                    Usuario usuario = new Usuario
-                    {
-                        ID = Convert.ToInt32(hfID.Value),
-                        NomeCompleto = txtNomeCompleto.Text.Trim(),
-                        CPF = txtCPF.Text.Replace(".", "").Replace("-", ""),
-                        Matricula = txtMatricula.Text.Trim(),
-                        Telefone = txtTelefone.Text.Trim(),
-                        Unidade = txtUnidade.Text.Trim(),
-                        Perfil = ddlPerfil.SelectedValue
-                    };
-
-                    if (usuario.ID == 0)
-                    {
-                        usuario.SenhaHash = Seguranca.GerarHashSenha(txtSenha.Text);
-                        dal.Inserir(usuario);
-                    }
-                    else
-                    {
-                        dal.Atualizar(usuario);
-                    }
-
-                    string script = @"
-                        <script type='text/javascript'>
-                            if (window.parent) {
-                                window.parent.$('#modalCadastro').modal('hide');
-                                window.parent.location.reload();
-                            }
-                        </script>";
-
-                    Response.Clear();
-                    Response.Write(script);
-                    Response.Flush();
-                    Context.ApplicationInstance.CompleteRequest();
                     return;
                 }
+
+                UsuarioDAL dal = new UsuarioDAL();
+
+                int usuarioId = Convert.ToInt32(hfID.Value);
+                string cpfLimpo = txtCPF.Text.Replace(".", "").Replace("-", "");
+
+                if (UsuarioDAL.ExisteCPF(cpfLimpo, usuarioId)) 
+                {
+                    cvCPFExistente.IsValid = false; 
+                    return;
+                }
+
+
+                Usuario usuario = new Usuario
+                {
+                    ID = Convert.ToInt32(hfID.Value),
+                    NomeCompleto = txtNomeCompleto.Text.Trim(),
+                    CPF = txtCPF.Text.Replace(".", "").Replace("-", ""),
+                    Matricula = txtMatricula.Text.Trim(),
+                    Telefone = txtTelefone.Text.Trim(),
+                    Unidade = txtUnidade.Text.Trim(),
+                    Perfil = ddlPerfil.SelectedValue
+                };
+
+                bool isNovoUsuario = (usuario.ID == 0);
+
+                if (isNovoUsuario)
+                {
+                    if (txtSenha.Text.Length < 6 && rfvSenha.Enabled)
+                    {
+                        ClientScript.RegisterStartupScript(this.GetType(), "SenhaInvalida", "alert('A senha deve ter pelo menos 6 caracteres.');", true);
+                        return;
+                    }
+                    usuario.SenhaHash = Seguranca.GerarHashSenha(txtSenha.Text); 
+                    dal.Inserir(usuario);
+                }
+                else
+                {
+                    dal.Atualizar(usuario);
+                }
+
+                string script = @"
+                    if (window.parent && window.parent.$ && typeof window.parent.__doPostBack === 'function') {
+                        window.parent.$('#modalCadastro').modal('hide');
+                        window.parent.__doPostBack('', 'RefreshGrid');
+                    } else {
+                        alert('Operação realizada. Por favor, atualize a página manualmente.');
+                        console.error('Contexto pai ou __doPostBack não encontrado.');
+                    }";
+                ClientScript.RegisterStartupScript(this.GetType(), "CloseModalAndRefresh", script, true);
             }
             catch (ThreadAbortException)
             {
-                // Ignora exceção de thread abortada
             }
             catch (Exception ex)
             {
-                Response.Clear();
-                Response.Write($"<div class='alert alert-danger'>Erro ao salvar: {ex.Message}</div>");
-                Response.Flush();
-                return;
+                string errorMsg = "Ocorreu um erro ao salvar o usuário: " + ex.Message.Replace("'", "\\'").Replace("\r", " ").Replace("\n", " ");
+                ClientScript.RegisterStartupScript(this.GetType(), "ErroSalvar", $"alert('{errorMsg}');", true);
             }
         }
 
@@ -160,7 +152,6 @@ namespace Projeto1
             if (cpf.Length != 11)
                 return false;
 
-            // Verifica dígitos repetidos
             bool todosDigitosIguais = true;
             for (int i = 1; i < cpf.Length; i++)
             {
@@ -173,7 +164,6 @@ namespace Projeto1
             if (todosDigitosIguais)
                 return false;
 
-            // Validação do CPF
             int[] multiplicador1 = new int[9] { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
             int[] multiplicador2 = new int[10] { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 };
 

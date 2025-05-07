@@ -137,7 +137,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalTitle">Novo Usuário</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body" id="modalBody">
                     <!-- Conteúdo será carregado via AJAX -->
@@ -150,19 +150,21 @@
 <asp:Content ID="Content3" ContentPlaceHolderID="Scripts" runat="server">
 <script type="text/javascript">
     function initModal() {
-        $('#modalCadastro').on('show.bs.modal', function(e) {
+        $('#modalCadastro').on('show.bs.modal', function (e) {
             var button = $(e.relatedTarget);
             var id = button.data('id') || 0;
-            var url = id > 0 ? '<%= ResolveUrl("~/Pages/CadastroUsuario.aspx?edit=") %>' + id : 
-                      '<%= ResolveUrl("~/Pages/CadastroUsuario.aspx") %>';
+            var url = id > 0 ? 'CadastroUsuario.aspx?edit=' + id : 'CadastroUsuario.aspx';
 
-            $('#modalBody').html('<div class="text-center p-4"><div class="spinner-border"></div></div>');
+            $('#modalTitle').text(id > 0 ? 'Editar Usuário' : 'Novo Usuário');
+            $('#modalBody').html('<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>');
+            $('#modalBody').load(url, function (response, status, xhr) {
+                if (status === "error") {
+                    $('#modalBody').html('<div class="alert alert-danger">Erro ao carregar o formulário</div>');
+                    return;
+                }
 
-            $.get(url, function(data) {
-                $('#modalBody').html(data);
                 applyMasks();
-            }).fail(function() {
-                $('#modalBody').html('<div class="alert alert-danger">Erro ao carregar</div>');
+                initValidators();
             });
         });
     }
@@ -172,14 +174,24 @@
         $('.phone-mask').inputmask('(99) [9]9999-9999');
     }
 
-    if (window.jQuery) {
-        initModal();
-    } else {
-        document.addEventListener('DOMContentLoaded', function() {
-            if (window.jQuery) {
-                initModal();
+    function initValidators() {
+        if (typeof (ValidatorOnLoad) === 'function') {
+            ValidatorOnLoad();
+        }
+
+        $('.form-control').on('input', function () {
+            if (typeof (Page_ClientValidate) === 'function') {
+                Page_ClientValidate();
             }
         });
     }
+
+    $(document).ready(function () {
+        initModal();
+
+        $(document).on('hidden.bs.modal', '#modalCadastro', function () {
+            $('#modalBody').html('');
+        });
+    });
 </script>
 </asp:Content>

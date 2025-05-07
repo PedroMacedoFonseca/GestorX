@@ -11,14 +11,14 @@ namespace Projeto1
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Session["UsuarioLogado"] == null && !IsPostBack)
+            {
+                Response.Redirect("~/Pages/login.aspx");
+                return;
+            }
+
             if (!IsPostBack)
             {
-                if (Session["UsuarioLogado"] == null)
-                {
-                    Response.Redirect("~/Pages/login.aspx");
-                    return;
-                }
-
                 Usuario usuario = (Usuario)Session["UsuarioLogado"];
 
                 if (usuario.Perfil == Perfis.Administrador)
@@ -32,6 +32,15 @@ namespace Projeto1
                     pnlAdmin.Visible = false;
                     pnlColaborador.Visible = true;
                     CarregarDadosUsuario(usuario);
+                }
+            }
+
+            else if (Request["__EVENTARGUMENT"] == "RefreshGrid")
+            {
+                Usuario usuario = (Usuario)Session["UsuarioLogado"];
+                if (usuario != null && usuario.Perfil == Perfis.Administrador)
+                {
+                    CarregarUsuarios(); 
                 }
             }
         }
@@ -95,7 +104,6 @@ namespace Projeto1
             dal.AtualizarSenha(usuario.ID, txtNovaSenha.Text);
             lblMensagemSenha.Text = "Senha alterada com sucesso!";
 
-            // Limpa os campos
             txtSenhaAtual.Text = "";
             txtNovaSenha.Text = "";
             txtConfirmarSenha.Text = "";

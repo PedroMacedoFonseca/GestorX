@@ -39,6 +39,29 @@
             padding: 2rem;
             margin-top: 20px;
         }
+
+        .text-danger.small {
+            font-size: 0.875em;
+            margin-top: 0.25rem;
+            display: none; 
+        }
+
+        .modal-content .btn[disabled] {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        .btn-primary.position-relative {
+            padding-right: 35px !important;
+        }
+        .spinner-border-sm.position-absolute {
+            width: 1.2rem;
+            height: 1.2rem;
+            border-width: .2em;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
     </style>
     
     <asp:ContentPlaceHolder ID="HeadContent" runat="server">
@@ -48,7 +71,7 @@
     <form id="form1" runat="server">
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href="~/Pages/Inicio.aspx">
+                <a class="navbar-brand" href="Inicio.aspx">
                     <i class="bi bi-hospital"></i> Santa Casa
                 </a>
                 

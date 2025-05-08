@@ -13,14 +13,13 @@ namespace Projeto1
 
         protected void Application_Start(object sender, EventArgs e)
         {
-            ScriptManager.ScriptResourceMapping.AddDefinition(
-                "jquery",
+            ScriptManager.ScriptResourceMapping.AddDefinition("jquery",
                 new ScriptResourceDefinition
                 {
-                    Path = "~/Scripts/jquery-3.x.min.js", // Ajuste o caminho conforme necessário
-                    DebugPath = "~/Scripts/jquery-3.x.js",   // Ajuste o caminho conforme necessário
-                    CdnPath = "https://ajax.googleapis.com/ajax/libs/jquery/3.x/jquery.min.js",
-                    CdnDebugPath = "https://ajax.googleapis.com/ajax/libs/jquery/3.x/jquery.js"
+                    Path = "https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.6.0.min.js",
+                    DebugPath = "https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.6.0.js",
+                    CdnSupportsSecureConnection = true,
+                    LoadSuccessExpression = "window.jQuery"
                 });
         }
 

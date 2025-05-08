@@ -7,8 +7,6 @@
     <title>Login - Sistema</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css"/>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.7-beta.19/jquery.inputmask.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
@@ -51,6 +49,7 @@
 </head>
 <body>
     <form id="form1" runat="server" class="login-container">
+         <asp:ScriptManager runat="server"></asp:ScriptManager>
         <div class="text-center mb-4">
             <h2><i class="bi bi-person-circle"></i> Acesso ao Sistema</h2>
         </div>
@@ -75,7 +74,10 @@
         <asp:Button ID="btnLogin" runat="server" Text="Entrar" CssClass="btn btn-primary btn-login" OnClick="btnLogin_Click" />
         <asp:Label ID="lblMensagemErro" runat="server" Text="" CssClass="error-message d-block text-center mt-3"></asp:Label>
         
-        <script type="text/javascript">
+    </form>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.6/jquery.inputmask.min.js"></script>
+    <script type="text/javascript">
             $(document).ready(function () {
                 $('#txtCPF').inputmask('999.999.999-99', {
                     placeholder: '___.___.___-__',
@@ -83,7 +85,6 @@
                     showMaskOnHover: false
                 });
             });
-        </script>
-    </form>
+    </script>
 </body>
 </html>

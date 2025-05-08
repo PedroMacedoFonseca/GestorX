@@ -77,7 +77,6 @@ namespace Projeto1
             if (cpf.Length != 11)
                 return false;
 
-            // Verifica dígitos repetidos
             bool todosDigitosIguais = true;
             for (int i = 1; i < cpf.Length; i++)
             {
@@ -90,7 +89,6 @@ namespace Projeto1
             if (todosDigitosIguais)
                 return false;
 
-            // Validação do CPF
             int[] multiplicador1 = new int[9] { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
             int[] multiplicador2 = new int[10] { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 };
 

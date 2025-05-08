@@ -8,26 +8,36 @@
             <div class="col-md-6 mb-3">
                 <label class="form-label">Nome Completo *</label>
                 <asp:TextBox ID="txtNomeCompleto" runat="server" CssClass="form-control" MaxLength="100"></asp:TextBox>
-                <asp:RequiredFieldValidator ID="rfvNome" runat="server" ControlToValidate="txtNomeCompleto"
-                    ErrorMessage="Campo obrigatório" Display="Dynamic" CssClass="text-danger small"></asp:RequiredFieldValidator>
+                <asp:RequiredFieldValidator ID="rfvNome" runat="server" ControlToValidate="txtNomeCompleto"  EnableClientScript="true"
+                    ErrorMessage="Campo obrigatório" ValidationGroup="vgCadastro" Display="Dynamic" CssClass="text-danger small"></asp:RequiredFieldValidator>
             </div>
         
             <div class="col-md-6 mb-3">
                 <label class="form-label">CPF *</label>
                 <asp:TextBox ID="txtCPF" runat="server" CssClass="form-control cpf-mask"></asp:TextBox>
-                <asp:RequiredFieldValidator ID="rfvCPF" runat="server" ControlToValidate="txtCPF"
-                    ErrorMessage="Campo obrigatório" Display="Dynamic" CssClass="text-danger small"></asp:RequiredFieldValidator>
-                <asp:CustomValidator ID="cvCPF" runat="server" ControlToValidate="txtCPF"
+                <asp:RequiredFieldValidator 
+                  ID="rfvCPF" runat="server" 
+                  ControlToValidate="txtCPF" 
+                  EnableClientScript="true"
+                  ErrorMessage="Campo obrigatório" 
+                  Display="Dynamic" 
+                  CssClass="text-danger small"
+                  ValidationGroup="vgCadastro" />
+                <asp:CustomValidator ID="cvCPF" runat="server" ControlToValidate="txtCPF"  EnableClientScript="true"
                     OnServerValidate="ValidateCPF" ErrorMessage="CPF inválido" Display="Dynamic"
-                    CssClass="text-danger small"></asp:CustomValidator>
-                <asp:CustomValidator ID="cvCPFExistente" runat="server"
+                    CssClass="text-danger small" ValidationGroup="vgCadastro" ClientValidationFunction="clientValidateCPF" />
+                <asp:CustomValidator 
+                    ID="cvCPFExistente" 
+                    runat="server"
                     ControlToValidate="txtCPF"
+                    EnableClientScript="true"  
                     OnServerValidate="ValidarCPFExistente"
                     ErrorMessage="CPF já cadastrado"
                     Display="Dynamic"
                     CssClass="text-danger small"
-                    ValidateEmptyText="true" 
-                    ClientValidationFunction="clientValidateCPF" />
+                    ValidateEmptyText="true"
+                    ValidationGroup="vgCadastro" 
+                    ClientValidationFunction="ValidarCPFExistente" />
             </div>
         </div>
     
@@ -36,7 +46,7 @@
                 <label class="form-label">Matrícula *</label>
                 <asp:TextBox ID="txtMatricula" runat="server" CssClass="form-control"></asp:TextBox>
                 <asp:RequiredFieldValidator ID="rfvMatricula" runat="server" ControlToValidate="txtMatricula"
-                    ErrorMessage="Campo obrigatório" Display="Dynamic" CssClass="text-danger small"></asp:RequiredFieldValidator>
+                    ErrorMessage="Campo obrigatório" ValidationGroup="vgCadastro" Display="Dynamic" CssClass="text-danger small"></asp:RequiredFieldValidator>
             </div>
         
             <div class="col-md-6 mb-3">
@@ -50,7 +60,7 @@
                 <label class="form-label">Unidade *</label>
                 <asp:TextBox ID="txtUnidade" runat="server" CssClass="form-control"></asp:TextBox>
                 <asp:RequiredFieldValidator ID="rfvUnidade" runat="server" ControlToValidate="txtUnidade"
-                    ErrorMessage="Campo obrigatório" Display="Dynamic" CssClass="text-danger small"></asp:RequiredFieldValidator>
+                    ErrorMessage="Campo obrigatório" ValidationGroup="vgCadastro" Display="Dynamic" CssClass="text-danger small"></asp:RequiredFieldValidator>
             </div>
         
             <div class="col-md-6 mb-3">
@@ -62,7 +72,7 @@
                     <asp:ListItem Value="Terceirizado">Terceirizado</asp:ListItem>
                 </asp:DropDownList>
                 <asp:RequiredFieldValidator ID="rfvPerfil" runat="server" ControlToValidate="ddlPerfil"
-                    ErrorMessage="Selecione um perfil" Display="Dynamic" CssClass="text-danger small"></asp:RequiredFieldValidator>
+                    ErrorMessage="Selecione um perfil" ValidationGroup="vgCadastro" Display="Dynamic" CssClass="text-danger small"></asp:RequiredFieldValidator>
             </div>
         </div>
     
@@ -78,7 +88,7 @@
                 </button>
             </div>
             <asp:RequiredFieldValidator ID="rfvSenha" runat="server" ControlToValidate="txtSenha"
-                ErrorMessage="Campo obrigatório" Display="Dynamic" CssClass="text-danger small"
+                ErrorMessage="Campo obrigatório" ValidationGroup="vgCadastro" Display="Dynamic" CssClass="text-danger small"
                 Enabled="True"></asp:RequiredFieldValidator>
             <small class="text-muted">A senha será visível apenas agora. Após o cadastro, não poderá ser consultada.</small>
         </div>
@@ -89,7 +99,10 @@
                 Text="Salvar"
                 CssClass="btn btn-primary"
                 OnClick="btnSalvar_Click"
-                OnClientClick="return validarAntesDeSalvar()" />
+                ValidationGroup="vgCadastro"
+                OnClientClick="if (!Page_ClientValidate('vgCadastro')) return false;" 
+                UseSubmitBehavior="false" />
+            <asp:Label ID="lblDebug" runat="server" CssClass="text-info small" />
         </div>
     </div>
 </form>
@@ -146,18 +159,36 @@
     }
 
     function clientValidateCPF(source, args) {
-        const cpf = $('#<%= txtCPF.ClientID %>').val().replace(/\D/g, '');
-        const idAtual = $('#<%= hfID.ClientID %>').val();
-        args.IsValid = true; 
+        const cpfRaw = $('#<%= txtCPF.ClientID %>').val();
+        const cpf = cpfRaw.replace(/\D/g, '');
+
+        if (cpf.length !== 11) { args.IsValid = false; return; }
+        if (/^(\d)\1{10}$/.test(cpf)) { args.IsValid = false; return; }
+        const calcDigit = (nums, mults) => {
+            let sum = 0;
+            for (let i = 0; i < mults.length; i++) {
+                sum += parseInt(nums[i]) * mults[i];
+            }
+            let resto = sum % 11;
+            return resto < 2 ? 0 : 11 - resto;
+        };
+
+        const mult1 = [10, 9, 8, 7, 6, 5, 4, 3, 2];
+        const mult2 = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
+
+        const dig1 = calcDigit(cpf, mult1);
+        const dig2 = calcDigit(cpf + dig1, mult2);
+
+        args.IsValid = (cpf.endsWith(`${dig1}${dig2}`));
     }
 
+
     function validarAntesDeSalvar() {
-        if (typeof (Page_ClientValidate) === 'function') {
-            Page_ClientValidate(''); 
-            if (!Page_IsValid) {
-                return false;
-            }
+        Page_ClientValidate('vgCadastro');
+        if (!Page_IsValid) {
+            $('.text-danger').show(); 
+            return false;
         }
-        return true; 
+        return confirm('Deseja realmente salvar os dados?');
     }
 </script>

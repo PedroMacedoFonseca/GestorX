@@ -60,23 +60,13 @@ namespace Projeto1
         {
             try
             {
+                Page.Validate("vgCadastro");
                 if (!Page.IsValid)
                 {
                     return;
                 }
 
                 UsuarioDAL dal = new UsuarioDAL();
-
-                int usuarioId = Convert.ToInt32(hfID.Value);
-                string cpfLimpo = txtCPF.Text.Replace(".", "").Replace("-", "");
-
-                if (UsuarioDAL.ExisteCPF(cpfLimpo, usuarioId)) 
-                {
-                    cvCPFExistente.IsValid = false; 
-                    return;
-                }
-
-
                 Usuario usuario = new Usuario
                 {
                     ID = Convert.ToInt32(hfID.Value),
@@ -105,18 +95,7 @@ namespace Projeto1
                     dal.Atualizar(usuario);
                 }
 
-                string script = @"
-                    if (window.parent && window.parent.$ && typeof window.parent.__doPostBack === 'function') {
-                        window.parent.$('#modalCadastro').modal('hide');
-                        window.parent.__doPostBack('', 'RefreshGrid');
-                    } else {
-                        alert('Operação realizada. Por favor, atualize a página manualmente.');
-                        console.error('Contexto pai ou __doPostBack não encontrado.');
-                    }";
-                ClientScript.RegisterStartupScript(this.GetType(), "CloseModalAndRefresh", script, true);
-            }
-            catch (ThreadAbortException)
-            {
+                ScriptManager.RegisterStartupScript(this, GetType(), "redirect", "window.location = '/Pages/Inicio.aspx';", true);
             }
             catch (Exception ex)
             {
@@ -143,6 +122,7 @@ namespace Projeto1
         protected void ValidateCPF(object source, ServerValidateEventArgs args)
         {
             args.IsValid = ValidarCPF(args.Value);
+            lblDebug.Text = "ValidarCPF: " + args.IsValid;
         }
 
         private bool ValidarCPF(string cpf)

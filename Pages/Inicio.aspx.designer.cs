@@ -24,6 +24,15 @@ namespace Projeto1
         protected global::System.Web.UI.WebControls.Panel pnlAdmin;
 
         /// <summary>
+        /// Controle btnAbrirModalNovoAsp.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton btnAbrirModalNovoAsp;
+
+        /// <summary>
         /// Controle gvUsuarios.
         /// </summary>
         /// <remarks>
@@ -148,5 +157,32 @@ namespace Projeto1
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblMensagemSenha;
+
+        /// <summary>
+        /// Controle updCadastro.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel updCadastro;
+
+        /// <summary>
+        /// Controle litModalTitle.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litModalTitle;
+
+        /// <summary>
+        /// Controle phCadastroUsuario.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder phCadastroUsuario;
     }
 }

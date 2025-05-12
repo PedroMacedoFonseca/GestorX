@@ -1,9 +1,7 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="CadastroUsuario.aspx.cs" Inherits="Projeto1.CadastroUsuario" %>
-
-<form id="form1" runat="server"> 
-    <div class="modal-body-content">
-        <asp:HiddenField ID="hfID" runat="server" Value="0" />
-    
+﻿<%@ Control Language="C#" AutoEventWireup="true" 
+    CodeBehind="CadastroUsuario.ascx.cs" 
+    Inherits="Projeto1.Controls.CadastroUsuario" %>
+    <asp:HiddenField ID="hfID" runat="server" />
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Nome Completo *</label>
@@ -30,14 +28,14 @@
                     ID="cvCPFExistente" 
                     runat="server"
                     ControlToValidate="txtCPF"
-                    EnableClientScript="true"  
+                    EnableClientScript="true"
+                    ClientValidationFunction="clientValidateCPFExistente"
                     OnServerValidate="ValidarCPFExistente"
                     ErrorMessage="CPF já cadastrado"
                     Display="Dynamic"
                     CssClass="text-danger small"
                     ValidateEmptyText="true"
-                    ValidationGroup="vgCadastro" 
-                    ClientValidationFunction="ValidarCPFExistente" />
+                    ValidationGroup="vgCadastro" />
             </div>
         </div>
     
@@ -80,7 +78,9 @@
             <label class="form-label">Senha Inicial *</label>
             <div class="input-group">
                 <asp:TextBox ID="txtSenha" runat="server" TextMode="Password" CssClass="form-control"></asp:TextBox>
-                <button class="btn btn-outline-secondary" type="button" id="btnGerarSenha" onclick="usarMatriculaComoSenha()">
+                <button type="button" id="btnGerarSenha" 
+                        onclick="usarMatriculaComoSenha(); return false;"
+                        class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-repeat"></i> Gerar
                 </button>
                 <button class="btn btn-outline-secondary" type="button" onclick="toggleSenha()" title="Mostrar/ocultar senha">
@@ -100,35 +100,12 @@
                 CssClass="btn btn-primary"
                 OnClick="btnSalvar_Click"
                 ValidationGroup="vgCadastro"
-                OnClientClick="if (!Page_ClientValidate('vgCadastro')) return false;" 
+                OnClientClick="if (!Page_ClientValidate('vgCadastro')) { return false; } else { $(this).prop('disabled', true); }"
                 UseSubmitBehavior="false" />
             <asp:Label ID="lblDebug" runat="server" CssClass="text-info small" />
         </div>
-    </div>
-</form>
 
 <script type="text/javascript">
-    $(document).ready(function () {
-
-        var isEditMode = $('#<%= hfID.ClientID %>').val() !== "0";
-
-       if (isEditMode) {
-           $('#<%= divSenha.ClientID %>').hide();
-            if (typeof (ValidatorEnable) === 'function' && document.getElementById('<%= rfvSenha.ClientID %>')) {
-                ValidatorEnable(document.getElementById('<%= rfvSenha.ClientID %>'), false);
-            }
-        } else {
-            $('#<%= divSenha.ClientID %>').show();
-            var matricula = $('#<%= txtMatricula.ClientID %>').val();
-            if (matricula) {
-                $('#<%= txtSenha.ClientID %>').val(matricula);
-            }
-            if (typeof(ValidatorEnable) === 'function' && document.getElementById('<%= rfvSenha.ClientID %>')) {
-               ValidatorEnable(document.getElementById('<%= rfvSenha.ClientID %>'), true);
-           }
-       }
-   });
-
     function usarMatriculaComoSenha() {
         const txtMatricula = document.getElementById('<%= txtMatricula.ClientID %>');
         const txtSenha = document.getElementById('<%= txtSenha.ClientID %>');
@@ -143,52 +120,51 @@
         }
     }
 
-    function toggleSenha() {
-        const txtSenha = document.getElementById('<%= txtSenha.ClientID %>');
-        const icone = document.getElementById('iconeSenha');
+    function clientValidateCPFExistente(sender, args) {
+        const cpf = args.Value.replace(/[^\d]/g, '');
+        const idAtual = parseInt($('#<%= hfID.ClientID %>').val() || 0, 10);
 
-        if (txtSenha.type === 'password') {
-            txtSenha.type = 'text';
-            icone.classList.remove('bi-eye');
-            icone.classList.add('bi-eye-slash');
-        } else {
-            txtSenha.type = 'password';
-            icone.classList.remove('bi-eye-slash');
-            icone.classList.add('bi-eye');
+    fetch("Inicio.aspx/VerificarCPFExistente", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cpf: cpf, idAtual: idAtual })
+    })
+        .then(response => response.json())
+        .then(data => args.IsValid = !data.d)
+        .catch(() => args.IsValid = false);
+    }
+
+    function mostrarErro(campo) {
+        $(campo).closest('.mb-3').find('.text-danger').addClass('d-block');
+    }
+
+    function clientValidateCPF(sender, args) {
+        var cpf = args.Value.replace(/[^\d]/g, '');
+        args.IsValid = validarCPF(cpf);
+    }
+
+    function validarCPF(cpf) {
+        if (cpf.length !== 11) return false;
+        if (/^(\d)\1{10}$/.test(cpf)) return false;
+
+        var sum = 0;
+        for (var i = 0; i < 9; i++) {
+            sum += parseInt(cpf.charAt(i)) * (10 - i);
         }
-    }
+        var remainder = sum % 11;
+        var digit1 = remainder < 2 ? 0 : 11 - remainder;
 
-    function clientValidateCPF(source, args) {
-        const cpfRaw = $('#<%= txtCPF.ClientID %>').val();
-        const cpf = cpfRaw.replace(/\D/g, '');
+        if (digit1 !== parseInt(cpf.charAt(9))) return false;
 
-        if (cpf.length !== 11) { args.IsValid = false; return; }
-        if (/^(\d)\1{10}$/.test(cpf)) { args.IsValid = false; return; }
-        const calcDigit = (nums, mults) => {
-            let sum = 0;
-            for (let i = 0; i < mults.length; i++) {
-                sum += parseInt(nums[i]) * mults[i];
-            }
-            let resto = sum % 11;
-            return resto < 2 ? 0 : 11 - resto;
-        };
-
-        const mult1 = [10, 9, 8, 7, 6, 5, 4, 3, 2];
-        const mult2 = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
-
-        const dig1 = calcDigit(cpf, mult1);
-        const dig2 = calcDigit(cpf + dig1, mult2);
-
-        args.IsValid = (cpf.endsWith(`${dig1}${dig2}`));
-    }
-
-
-    function validarAntesDeSalvar() {
-        Page_ClientValidate('vgCadastro');
-        if (!Page_IsValid) {
-            $('.text-danger').show(); 
-            return false;
+        sum = 0;
+        for (var i = 0; i < 10; i++) {
+            sum += parseInt(cpf.charAt(i)) * (11 - i);
         }
-        return confirm('Deseja realmente salvar os dados?');
+        remainder = sum % 11;
+        var digit2 = remainder < 2 ? 0 : 11 - remainder;
+
+        return digit2 === parseInt(cpf.charAt(10));
     }
+
+
 </script>

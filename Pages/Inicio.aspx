@@ -1,5 +1,6 @@
 ﻿<%@ Page Title="Início" Language="C#" MasterPageFile="~/MP.Master" AutoEventWireup="true" 
     CodeBehind="Inicio.aspx.cs" Inherits="Projeto1.Inicio" %>
+<%@ Register TagPrefix="uc" Namespace="Projeto1.Controls" Assembly="Projeto1" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
     <style>
@@ -45,9 +46,9 @@
                     <h4 class="mb-0"><i class="bi bi-people-fill"></i> Gerenciamento de Usuários</h4>
                 </div>
                 <div class="card-body">
-                    <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#modalCadastro">
+                    <asp:LinkButton ID="btnAbrirModalNovoAsp" runat="server" CssClass="btn btn-success" OnClick="btnAbrirModalNovoUsuario_Click">
                         <i class="bi bi-plus-circle"></i> Novo Usuário
-                    </button>
+                    </asp:LinkButton>
                     
                     <div class="table-responsive">
                         <asp:GridView ID="gvUsuarios" runat="server" AutoGenerateColumns="False"
@@ -63,11 +64,12 @@
                                     DataFormatString="{0:dd/MM/yyyy HH:mm}" />
                                 <asp:TemplateField HeaderText="Ações">
                                     <ItemTemplate>
-                                        <button type="button" class="btn btn-sm btn-outline-primary" 
-                                                data-bs-toggle="modal" data-bs-target="#modalCadastro" 
-                                                data-id='<%# Eval("ID") %>'>
+                                          <asp:LinkButton runat="server" CommandName="Editar" CommandArgument='<%# Eval("ID") %>'
+                                            CssClass="btn btn-sm btn-outline-primary"
+                                            ToolTip="Editar"
+                                            OnClientClick='<%# $"dispararEdicaoPostBack({Eval("ID")}); return false;" %>'>
                                             <i class="bi bi-pencil"></i> Editar
-                                        </button>
+                                        </asp:LinkButton>
                                         <asp:LinkButton runat="server" CommandName="Excluir" CommandArgument='<%# Eval("ID") %>'
                                             CssClass="btn btn-sm btn-outline-danger ms-1" ToolTip="Excluir"
                                             OnClientClick="return confirm('Tem certeza que deseja excluir este usuário?');">
@@ -135,13 +137,19 @@
     <div class="modal fade" id="modalCadastro" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">Novo Usuário</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                <div class="modal-body" id="modalBody">
-                    <!-- Conteúdo será carregado via AJAX -->
-                </div>
+                <asp:UpdatePanel ID="updCadastro" runat="server" UpdateMode="Conditional">
+                    <ContentTemplate>
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <asp:Literal ID="litModalTitle" runat="server" Text="Novo Usuário" />
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <asp:PlaceHolder ID="phCadastroUsuario" runat="server"></asp:PlaceHolder>
+                        </div>
+                    </ContentTemplate>
+                </asp:UpdatePanel>
             </div>
         </div>
     </div>
@@ -149,49 +157,44 @@
 
 <asp:Content ID="Content3" ContentPlaceHolderID="Scripts" runat="server">
 <script type="text/javascript">
-    function initModal() {
-        $('#modalCadastro').on('show.bs.modal', function (e) {
-            var button = $(e.relatedTarget);
-            var id = button.data('id') || 0;
-            var url = id > 0 ? 'CadastroUsuario.aspx?edit=' + id : 'CadastroUsuario.aspx';
+    function abrirModal() {
+        $('#modalCadastro').modal('show');
+    }
 
-            $('#modalTitle').text(id > 0 ? 'Editar Usuário' : 'Novo Usuário');
-            $('#modalBody').html('<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>');
-            $('#modalBody').load(url, function (response, status, xhr) {
-                if (status === "error") {
-                    $('#modalBody').html('<div class="alert alert-danger">Erro ao carregar o formulário</div>');
-                    return;
-                }
-
-                applyMasks();
-                initValidators();
-            });
-        });
+    function dispararEdicaoPostBack(id) {
+        __doPostBack('<%= updCadastro.UniqueID %>', 'Editar_' + id);
     }
 
     function applyMasks() {
-        $('.cpf-mask').inputmask('999.999.999-99');
-        $('.phone-mask').inputmask('(99) [9]9999-9999');
+        if (typeof $.fn.inputmask === 'function') {
+           $('.cpf-mask').inputmask('999.999.999-99');
+           $('.phone-mask').inputmask('(99) [9]9999-9999');
+        }
     }
 
-    function initValidators() {
-        if (typeof (ValidatorOnLoad) === 'function') {
-            ValidatorOnLoad();
-        }
-
-        $('.form-control').on('input', function () {
-            if (typeof (Page_ClientValidate) === 'function') {
-                Page_ClientValidate();
+    function applyValidators() {
+        if (typeof (Page_Validators) !== 'undefined') {
+            for (var i = 0; i < Page_Validators.length; i++) {
+                ValidatorValidate(Page_Validators[i]);
             }
-        });
+        }
     }
 
     $(document).ready(function () {
-        initModal();
-
-        $(document).on('hidden.bs.modal', '#modalCadastro', function () {
-            $('#modalBody').html('');
+        $('#modalCadastro').on('shown.bs.modal', function () {
+            applyMasks();
+            applyValidators();
         });
+        if ($('#modalCadastro').is(':visible')) {
+            applyMasks();
+            applyValidators();
+        }
     });
+
+    Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function (sender, args) {
+        applyMasks(); 
+        applyValidators(); 
+    });
+
 </script>
 </asp:Content>

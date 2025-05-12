@@ -221,7 +221,7 @@ namespace Projeto1.DAL
             }
         }
 
-        public static bool ExisteCPF(string cpf, int idAtual = 0)
+        public bool ExisteCPF(string cpf, int idAtual = 0)
         {
             string connectionString = ConfigurationManager.ConnectionStrings["MinhaConexao"].ConnectionString;
 

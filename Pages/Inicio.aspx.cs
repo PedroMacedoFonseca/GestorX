@@ -17,19 +17,8 @@ namespace Projeto1
 
         protected void Page_Init(object sender, EventArgs e)
         {
-            if (Request.Form["__EVENTTARGET"] == updCadastro.UniqueID ||
-                phCadastroUsuario.FindControl("cadUsuario") != null ||
-                Session["AbrirModalUsuario"] != null && (bool)Session["AbrirModalUsuario"])
-            {
-                EnsureCadastroUsuarioControlIsLoaded();
-            }
-
-            if (Request.Form["__EVENTTARGET"] == updUnidade.UniqueID ||
-                phCadastroUnidade.FindControl("cadUnidade") != null ||
-                Session["AbrirModalUnidade"] != null && (bool)Session["AbrirModalUnidade"])
-            {
-                EnsureCadastroUnidadeControlIsLoaded();
-            }
+            EnsureCadastroUsuarioControlIsLoaded();
+            EnsureCadastroUnidadeControlIsLoaded();
         }
 
         protected void Page_Load(object sender, EventArgs e)

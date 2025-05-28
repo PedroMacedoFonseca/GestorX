@@ -128,6 +128,11 @@
                             <asp:PlaceHolder ID="phCadastroUsuario" runat="server"></asp:PlaceHolder>
                         </div>
                     </ContentTemplate>
+                      <Triggers>
+                        <asp:AsyncPostBackTrigger 
+                            ControlID="cadUsuario$btnSalvar" 
+                            EventName="Click" />
+                      </Triggers>
                 </asp:UpdatePanel>
             </div>
         </div>
@@ -190,6 +195,11 @@
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                         </div>
                     </ContentTemplate>
+                       <Triggers>
+                        <asp:AsyncPostBackTrigger 
+                            ControlID="cadUnidade$btnSalvarUnidade" 
+                            EventName="Click" />
+                      </Triggers>
                 </asp:UpdatePanel>
             </div>
         </div>

@@ -71,14 +71,30 @@
     <Content Include="App_Data\DatabaseProjeto_log.ldf">
       <DependentUpon>DatabaseProjeto.mdf</DependentUpon>
     </Content>
+    <Content Include="Controls\CadastroUnidade.ascx" />
     <Content Include="Controls\CadastroUsuario.ascx" />
+    <Content Include="CSS\login.css" />
     <Content Include="Pages\Inicio.aspx" />
     <Content Include="Global.asax" />
     <Content Include="Pages\login.aspx" />
     <Content Include="Pages\TrocaSenha.aspx" />
+    <Content Include="CSS\styles.css" />
+    <Content Include="Scripts\Core\Masks.js" />
+    <Content Include="Scripts\Core\Modals.js" />
+    <Content Include="Scripts\Core\Validators.js" />
+    <Content Include="Scripts\Inicio.js" />
+    <Content Include="Scripts\Scripts.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\CadastroUnidade.ascx.cs">
+      <DependentUpon>CadastroUnidade.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Controls\CadastroUnidade.ascx.designer.cs">
+      <DependentUpon>CadastroUnidade.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="DAL\UnidadeDAL.cs" />
     <Compile Include="Helpers\CpfHelper.cs" />
     <Compile Include="Models\Perfis.cs" />
     <Compile Include="Controls\CadastroUsuario.ascx.cs">
@@ -88,6 +104,7 @@
     <Compile Include="Controls\CadastroUsuario.ascx.designer.cs">
       <DependentUpon>CadastroUsuario.ascx</DependentUpon>
     </Compile>
+    <Compile Include="Models\Unidade.cs" />
     <Compile Include="Pages\Inicio.aspx.cs">
       <DependentUpon>Inicio.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

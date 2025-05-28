@@ -8,7 +8,8 @@ namespace Projeto1.Models
         public string NomeCompleto { get; set; }
         public string CPF { get; set; }
         public string SenhaHash { get; set; }
-        public string Unidade { get; set; }
+        public int? UnidadeID { get; set; }
+        public string NomeUnidade { get; set; } 
         public string Perfil { get; set; }
         public DateTime DataCadastro { get; set; }
         public string Telefone { get; set; }

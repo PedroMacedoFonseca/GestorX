@@ -3,43 +3,10 @@
 <%@ Register TagPrefix="uc" Namespace="Projeto1.Controls" Assembly="Projeto1" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
-    <style>
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        
-        .card-header {
-            border-radius: 10px 10px 0 0 !important;
-        }
-        
-        .badge {
-            font-size: 0.9em;
-            padding: 5px 10px;
-        }
-        
-        .user-info p {
-            margin-bottom: 0.8rem;
-        }
-        
-        .user-info strong {
-            display: inline-block;
-            width: 120px;
-        }
-        
-        .table-responsive {
-            overflow-x: auto;
-        }
-        
-        .table th {
-            background-color: #f8f9fa;
-        }
-    </style>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
-    <div class="container mt-4">
+<div class="container mt-4">
         <asp:Panel ID="pnlAdmin" runat="server" Visible="false">
             <div class="card">
                 <div class="card-header bg-primary text-white">
@@ -50,7 +17,15 @@
                         <i class="bi bi-plus-circle"></i> Novo Usuário
                     </asp:LinkButton>
                     
-                    <div class="table-responsive">
+                    <asp:LinkButton ID="btnAbrirModalNovaUnidade" runat="server" CssClass="btn btn-info ms-2" OnClick="btnAbrirModalNovaUnidade_Click">
+                        <i class="bi bi-building-add"></i> Cadastrar Unidade
+                    </asp:LinkButton>
+                    <asp:LinkButton ID="btnGerenciarUnidades" runat="server" CssClass="btn btn-secondary ms-2" OnClick="btnGerenciarUnidades_Click">
+                        <i class="bi bi-pencil-square"></i> Gerenciar Unidades
+                    </asp:LinkButton>
+
+
+                    <div class="table-responsive mt-3">
                         <asp:GridView ID="gvUsuarios" runat="server" AutoGenerateColumns="False"
                             CssClass="table table-striped table-hover" DataKeyNames="ID"
                             OnRowCommand="gvUsuarios_RowCommand" EmptyDataText="Nenhum usuário cadastrado.">
@@ -58,17 +33,19 @@
                                 <asp:BoundField DataField="ID" HeaderText="ID" />
                                 <asp:BoundField DataField="NomeCompleto" HeaderText="Nome Completo" />
                                 <asp:BoundField DataField="CPF" HeaderText="CPF" />
-                                <asp:BoundField DataField="Unidade" HeaderText="Unidade" />
+                                <asp:BoundField DataField="NomeUnidade" HeaderText="Unidade" />
                                 <asp:BoundField DataField="Perfil" HeaderText="Perfil" />
                                 <asp:BoundField DataField="DataCadastro" HeaderText="Cadastrado em" 
                                     DataFormatString="{0:dd/MM/yyyy HH:mm}" />
                                 <asp:TemplateField HeaderText="Ações">
                                     <ItemTemplate>
-                                          <asp:LinkButton runat="server" CommandName="Editar" CommandArgument='<%# Eval("ID") %>'
+                                        <asp:LinkButton
+                                            runat="server"
+                                            CommandName="Editar"
+                                            CommandArgument='<%# Eval("ID") %>'
                                             CssClass="btn btn-sm btn-outline-primary"
-                                            ToolTip="Editar"
-                                            OnClientClick='<%# $"dispararEdicaoPostBack({Eval("ID")}); return false;" %>'>
-                                            <i class="bi bi-pencil"></i> Editar
+                                            ToolTip="Editar">
+                                          <i class="bi bi-pencil"></i> Editar
                                         </asp:LinkButton>
                                         <asp:LinkButton runat="server" CommandName="Excluir" CommandArgument='<%# Eval("ID") %>'
                                             CssClass="btn btn-sm btn-outline-danger ms-1" ToolTip="Excluir"
@@ -133,20 +110,84 @@
         </asp:Panel>
     </div>
     
-    <!-- Modal para Cadastro/Edição -->
     <div class="modal fade" id="modalCadastro" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <asp:UpdatePanel ID="updCadastro" runat="server" UpdateMode="Conditional">
+                <asp:UpdatePanel ID="updCadastro" runat="server" UpdateMode="Conditional" ChildrenAsTriggers="true">
                     <ContentTemplate>
                         <div class="modal-header">
                             <h5 class="modal-title">
                                 <asp:Literal ID="litModalTitle" runat="server" Text="Novo Usuário" />
                             </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
+                            <asp:Label ID="lblModalErrorMessage" runat="server" 
+                                CssClass="text-danger small mb-2 d-block" 
+                                Visible="false" EnableViewState="true"></asp:Label>
                             <asp:PlaceHolder ID="phCadastroUsuario" runat="server"></asp:PlaceHolder>
+                        </div>
+                    </ContentTemplate>
+                </asp:UpdatePanel>
+            </div>
+        </div>
+    </div>
+
+     <div class="modal fade" id="modalUnidade" tabindex="-1" aria-labelledby="modalUnidadeLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <asp:UpdatePanel ID="updUnidade" runat="server" UpdateMode="Conditional" ChildrenAsTriggers="true">
+                    <ContentTemplate>
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalUnidadeLabel">
+                                <asp:Literal ID="litModalUnidadeTitle" runat="server" Text="Nova Unidade" />
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <asp:PlaceHolder ID="phCadastroUnidade" runat="server"></asp:PlaceHolder>
+                        </div>
+                    </ContentTemplate>
+                </asp:UpdatePanel>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalGerenciarUnidades" tabindex="-1" aria-labelledby="modalGerenciarUnidadesLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                 <asp:UpdatePanel ID="updGerenciarUnidades" runat="server" UpdateMode="Conditional">
+                    <ContentTemplate>
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalGerenciarUnidadesLabel">Gerenciar Unidades</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <asp:GridView ID="gvUnidades" runat="server" AutoGenerateColumns="False"
+                                CssClass="table table-striped table-hover" DataKeyNames="UnidadeID"
+                                OnRowCommand="gvUnidades_RowCommand" EmptyDataText="Nenhuma unidade cadastrada.">
+                                <Columns>
+                                    <asp:BoundField DataField="UnidadeID" HeaderText="ID" />
+                                    <asp:BoundField DataField="Nome" HeaderText="Nome da Unidade" />
+                                    <asp:CheckBoxField DataField="Ativo" HeaderText="Ativa" ReadOnly="true" />
+                                    <asp:TemplateField HeaderText="Ações">
+                                        <ItemTemplate>
+                                            <asp:LinkButton ID="btnEditarUnidadeGrid" runat="server" CommandName="EditarUnidade" 
+                                                CommandArgument='<%# Eval("UnidadeID") %>' CssClass="btn btn-sm btn-outline-primary" ToolTip="Editar">
+                                                <i class="bi bi-pencil"></i>
+                                            </asp:LinkButton>
+                                            <asp:LinkButton ID="btnExcluirUnidadeGrid" runat="server" CommandName="ExcluirUnidade" 
+                                                CommandArgument='<%# Eval("UnidadeID") %>' CssClass="btn btn-sm btn-outline-danger ms-1" ToolTip="Excluir/Inativar"
+                                                OnClientClick="return confirm('Tem certeza que deseja excluir/inativar esta unidade?');">
+                                                <i class="bi bi-trash"></i>
+                                            </asp:LinkButton>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                </Columns>
+                            </asp:GridView>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                         </div>
                     </ContentTemplate>
                 </asp:UpdatePanel>
@@ -156,45 +197,8 @@
 </asp:Content>
 
 <asp:Content ID="Content3" ContentPlaceHolderID="Scripts" runat="server">
-<script type="text/javascript">
-    function abrirModal() {
-        $('#modalCadastro').modal('show');
-    }
-
-    function dispararEdicaoPostBack(id) {
-        __doPostBack('<%= updCadastro.UniqueID %>', 'Editar_' + id);
-    }
-
-    function applyMasks() {
-        if (typeof $.fn.inputmask === 'function') {
-           $('.cpf-mask').inputmask('999.999.999-99');
-           $('.phone-mask').inputmask('(99) [9]9999-9999');
-        }
-    }
-
-    function applyValidators() {
-        if (typeof (Page_Validators) !== 'undefined') {
-            for (var i = 0; i < Page_Validators.length; i++) {
-                ValidatorValidate(Page_Validators[i]);
-            }
-        }
-    }
-
-    $(document).ready(function () {
-        $('#modalCadastro').on('shown.bs.modal', function () {
-            applyMasks();
-            applyValidators();
-        });
-        if ($('#modalCadastro').is(':visible')) {
-            applyMasks();
-            applyValidators();
-        }
-    });
-
-    Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function (sender, args) {
-        applyMasks(); 
-        applyValidators(); 
-    });
-
-</script>
+    <script type="module" src="../Scripts/Scripts.js" defer></script>
+    <script type="module">
+        const errorLabel = document.getElementById('<%= lblModalErrorMessage.ClientID %>');
+    </script>
 </asp:Content>

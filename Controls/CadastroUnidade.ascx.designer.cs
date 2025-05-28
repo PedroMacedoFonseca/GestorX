@@ -7,74 +7,92 @@
 // </gerado automaticamente>
 //------------------------------------------------------------------------------
 
-namespace Projeto1
+namespace Projeto1.Controls
 {
 
 
-    public partial class MP
+    public partial class CadastroUnidade
     {
 
         /// <summary>
-        /// Controle HeadContent.
+        /// Controle hfUnidadeID.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ContentPlaceHolder HeadContent;
+        protected global::System.Web.UI.WebControls.HiddenField hfUnidadeID;
 
         /// <summary>
-        /// Controle form1.
+        /// Controle pnlValidation.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlForm form1;
+        protected global::System.Web.UI.WebControls.Panel pnlValidation;
 
         /// <summary>
-        /// Controle ScriptManager1.
+        /// Controle lblValidationSummary.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::System.Web.UI.ScriptManager ScriptManager1;
+        protected global::System.Web.UI.WebControls.Label lblValidationSummary;
 
         /// <summary>
-        /// Controle AdminMenu.
+        /// Controle txtNomeUnidade.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder AdminMenu;
+        protected global::System.Web.UI.WebControls.TextBox txtNomeUnidade;
 
         /// <summary>
-        /// Controle btnLogout.
+        /// Controle rfvNomeUnidade.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton btnLogout;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvNomeUnidade;
 
         /// <summary>
-        /// Controle MainContent.
+        /// Controle chkUnidadeAtiva.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ContentPlaceHolder MainContent;
+        protected global::System.Web.UI.WebControls.CheckBox chkUnidadeAtiva;
 
         /// <summary>
-        /// Controle Scripts.
+        /// Controle btnSalvarUnidade.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ContentPlaceHolder Scripts;
+        protected global::System.Web.UI.WebControls.Button btnSalvarUnidade;
+
+        /// <summary>
+        /// Controle lblSuccessMessage.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblSuccessMessage;
+
+        /// <summary>
+        /// Controle lblMensagemUnidade.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblMensagemUnidade;
     }
 }

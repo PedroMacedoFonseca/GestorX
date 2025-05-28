@@ -29,11 +29,8 @@ namespace Projeto1
                 UsuarioDAL dal = new UsuarioDAL();
 
                 dal.AtualizarSenha(usuario.ID, txtNovaSenha.Text);
-
-                // Atualiza a sessão e redireciona
                 Session["UsuarioLogado"] = usuario;
                 Session.Remove("UsuarioTrocaSenha");
-
                 Response.Redirect("~/Pages/Inicio.aspx");
             }
         }

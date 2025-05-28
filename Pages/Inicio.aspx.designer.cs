@@ -33,6 +33,24 @@ namespace Projeto1
         protected global::System.Web.UI.WebControls.LinkButton btnAbrirModalNovoAsp;
 
         /// <summary>
+        /// Controle btnAbrirModalNovaUnidade.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton btnAbrirModalNovaUnidade;
+
+        /// <summary>
+        /// Controle btnGerenciarUnidades.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton btnGerenciarUnidades;
+
+        /// <summary>
         /// Controle gvUsuarios.
         /// </summary>
         /// <remarks>
@@ -177,6 +195,15 @@ namespace Projeto1
         protected global::System.Web.UI.WebControls.Literal litModalTitle;
 
         /// <summary>
+        /// Controle lblModalErrorMessage.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblModalErrorMessage;
+
+        /// <summary>
         /// Controle phCadastroUsuario.
         /// </summary>
         /// <remarks>
@@ -184,5 +211,50 @@ namespace Projeto1
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
         protected global::System.Web.UI.WebControls.PlaceHolder phCadastroUsuario;
+
+        /// <summary>
+        /// Controle updUnidade.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel updUnidade;
+
+        /// <summary>
+        /// Controle litModalUnidadeTitle.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litModalUnidadeTitle;
+
+        /// <summary>
+        /// Controle phCadastroUnidade.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder phCadastroUnidade;
+
+        /// <summary>
+        /// Controle updGerenciarUnidades.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel updGerenciarUnidades;
+
+        /// <summary>
+        /// Controle gvUnidades.
+        /// </summary>
+        /// <remarks>
+        /// Campo gerado automaticamente.
+        /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.GridView gvUnidades;
     }
 }

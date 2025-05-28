@@ -12,24 +12,39 @@ namespace Projeto1
     public partial class Inicio : System.Web.UI.Page
     {
         private CadastroUsuario cadUsuarioCtrl;
+        private CadastroUnidade cadUnidadeCtrl;
+        private readonly UnidadeDAL _unidadeDAL = new UnidadeDAL();
+
         protected void Page_Init(object sender, EventArgs e)
         {
-            EnsureCadastroUsuarioControlIsLoaded();
+            if (Request.Form["__EVENTTARGET"] == updCadastro.UniqueID ||
+                phCadastroUsuario.FindControl("cadUsuario") != null ||
+                Session["AbrirModalUsuario"] != null && (bool)Session["AbrirModalUsuario"])
+            {
+                EnsureCadastroUsuarioControlIsLoaded();
+            }
+
+            if (Request.Form["__EVENTTARGET"] == updUnidade.UniqueID ||
+                phCadastroUnidade.FindControl("cadUnidade") != null ||
+                Session["AbrirModalUnidade"] != null && (bool)Session["AbrirModalUnidade"])
+            {
+                EnsureCadastroUnidadeControlIsLoaded();
+            }
         }
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Session["UsuarioLogado"] == null && !IsPostBack)
+            if (Session["UsuarioLogado"] == null)
             {
                 Response.Redirect("~/Pages/login.aspx");
                 return;
             }
 
+            Usuario usuarioLogado = (Usuario)Session["UsuarioLogado"];
+
             if (!IsPostBack)
             {
-                Session["IsCadastroUsuarioLoaded"] = false;
-                Usuario usuario = (Usuario)Session["UsuarioLogado"];
-
-                if (usuario.Perfil == Perfis.Administrador)
+                if (usuarioLogado.Perfil == "Administrador")
                 {
                     pnlAdmin.Visible = true;
                     pnlColaborador.Visible = false;
@@ -39,8 +54,34 @@ namespace Projeto1
                 {
                     pnlAdmin.Visible = false;
                     pnlColaborador.Visible = true;
-                    CarregarDadosUsuario(usuario);
+                    CarregarDadosUsuario(usuarioLogado);
                 }
+            }
+
+            if (Session["AbrirModalUsuario"] != null && (bool)Session["AbrirModalUsuario"])
+            {
+                EnsureCadastroUsuarioControlIsLoaded();
+                ScriptManager.RegisterStartupScript(
+                    updCadastro,
+                    updCadastro.GetType(),
+                    "ReabrirModalUsuario",
+                    "window.shouldOpenModalCadastro = true;",
+                    addScriptTags: true
+                );
+                Session["AbrirModalUsuario"] = null;
+            }
+
+            if (Session["AbrirModalUnidade"] != null && (bool)Session["AbrirModalUnidade"])
+            {
+                EnsureCadastroUnidadeControlIsLoaded();
+                ScriptManager.RegisterStartupScript(
+                    updUnidade,
+                    updUnidade.GetType(),
+                    "ReabrirModalUnidade",
+                    "window.shouldOpenModalUnidade = true;",
+                    addScriptTags: true
+                );
+                Session["AbrirModalUnidade"] = null;
             }
 
             if (IsPostBack && Request.Form["__EVENTTARGET"] == updCadastro.UniqueID)
@@ -48,82 +89,24 @@ namespace Projeto1
                 string argument = Request.Form["__EVENTARGUMENT"];
                 if (!string.IsNullOrEmpty(argument) && argument.StartsWith("Editar_"))
                 {
-                    EnsureCadastroUsuarioControlIsLoaded(); 
-                    int id = int.Parse(argument.Split('_')[1]);
-                    cadUsuarioCtrl.CarregarUsuarioParaEdicao(id);
-                    litModalTitle.Text = "Editar Usuário";
-                    updCadastro.Update();
-                    ScriptManager.RegisterStartupScript(
-                        updCadastro,
-                        updCadastro.GetType(),
-                        "AbrirModalEdicao",
-                        "$('#modalCadastro').modal('show');",
-                        true
-                    );
+                    EnsureCadastroUsuarioControlIsLoaded();
+                    if (cadUsuarioCtrl != null)
+                    {
+                        int id = int.Parse(argument.Split('_')[1]);
+                        cadUsuarioCtrl.CarregarUsuarioParaEdicao(id);
+                        litModalTitle.Text = "Editar Usuário";
+                        lblModalErrorMessage.Visible = false;
+                        updCadastro.Update();
+                        ScriptManager.RegisterStartupScript(
+                            updCadastro,
+                            updCadastro.GetType(),
+                            "AbrirModalEdicaoUsuario",
+                            "window.shouldOpenModalCadastro = true;",
+                            addScriptTags: true
+                        );
+                    }
                 }
             }
-
-            var userCtrl = phCadastroUsuario.FindControl("cadUsuario") as Projeto1.Controls.CadastroUsuario;
-            if (userCtrl != null)
-            {
-                var btnSalvar = userCtrl.FindControl("btnSalvar");
-                if (btnSalvar != null)
-                {
-                    ScriptManager.GetCurrent(this).RegisterAsyncPostBackControl(btnSalvar);
-                }
-            }
-        }
-
-        private void EnsureCadastroUsuarioControlIsLoaded()
-        {
-            if (phCadastroUsuario.FindControl("cadUsuario") == null)
-            {
-                cadUsuarioCtrl = (CadastroUsuario)LoadControl("~/Controls/CadastroUsuario.ascx");
-                cadUsuarioCtrl.ID = "cadUsuario";
-                cadUsuarioCtrl.SalvoComSucesso += cadUsuario_SalvoComSucesso;
-                cadUsuarioCtrl.ErroOcorreu += cadUsuario_ErroOcorreu;
-                phCadastroUsuario.Controls.Add(cadUsuarioCtrl);
-            }
-        }
-
-        protected void btnAbrirModalNovoUsuario_Click(object sender, EventArgs e)
-        {
-            EnsureCadastroUsuarioControlIsLoaded();
-            cadUsuarioCtrl.InicializarParaNovoUsuario();
-            litModalTitle.Text = "Novo Usuário";
-            updCadastro.Update();
-
-            ScriptManager.RegisterStartupScript(
-                updCadastro,
-                updCadastro.GetType(),
-                "AbrirModalNovo",
-                "var myModal = new bootstrap.Modal(document.getElementById('modalCadastro')); myModal.show();",
-                true
-            );
-        }
-
-        protected void cadUsuario_SalvoComSucesso(object sender, EventArgs e)
-        {
-            CarregarUsuarios();
-            ScriptManager.RegisterStartupScript(this, GetType(), "SalvoSucessoEFecharModal", "alert('Usuário salvo com sucesso!'); $('#modalCadastro').modal('hide');", true);
-
-            if (phCadastroUsuario != null)
-            {
-                phCadastroUsuario.Controls.Clear(); 
-            }
-            Session["IsCadastroUsuarioLoaded"] = false;
-        }
-
-        protected void cadUsuario_ErroOcorreu(object sender, Exception ex)
-        {
-            updCadastro.Update();
-
-            ScriptManager.RegisterStartupScript(
-                updCadastro,
-                updCadastro.GetType(),
-                "ShowModalComMasks",
-                "$('#modalCadastro').modal('show');",
-                true);
         }
 
         private void CarregarUsuarios()
@@ -133,25 +116,164 @@ namespace Projeto1
             gvUsuarios.DataBind();
         }
 
+        public void AtualizarGridUsuarios()
+        {
+            CarregarUsuarios();
+            gvUsuarios.DataBind();
+            updCadastro.Update(); 
+        }
+
         private void CarregarDadosUsuario(Usuario usuario)
         {
-            lblNome.Text = usuario.NomeCompleto;
-            lblCPF.Text = FormatCPF(usuario.CPF);
-            lblMatricula.Text = usuario.Matricula;
-            lblUnidade.Text = usuario.Unidade;
-            lblTelefone.Text = usuario.Telefone;
-            lblPerfil.Text = usuario.Perfil;
-            lblDataCadastro.Text = usuario.DataCadastro.ToString("dd/MM/yyyy HH:mm");
+            UsuarioDAL dal = new UsuarioDAL();
+            var usuarioCompleto = dal.ObterPorId(usuario.ID);
+
+            if (usuarioCompleto != null)
+            {
+                lblNome.Text = usuarioCompleto.NomeCompleto;
+                lblCPF.Text = FormatCPF(usuarioCompleto.CPF);
+                lblMatricula.Text = usuarioCompleto.Matricula;
+                lblUnidade.Text = usuarioCompleto.NomeUnidade;
+                lblTelefone.Text = usuarioCompleto.Telefone;
+                lblPerfil.Text = usuarioCompleto.Perfil;
+                lblDataCadastro.Text = usuarioCompleto.DataCadastro.ToString("dd/MM/yyyy HH:mm");
+            }
+            else
+            {
+                lblNome.Text = "Erro ao carregar dados.";
+            }
+        }
+
+        private void EnsureCadastroUsuarioControlIsLoaded()
+        {
+            if (phCadastroUsuario.FindControl("cadUsuario") == null)
+            {
+                cadUsuarioCtrl = (CadastroUsuario)LoadControl("~/Controls/CadastroUsuario.ascx");
+                cadUsuarioCtrl.ID = "cadUsuario";
+                cadUsuarioCtrl.SalvoComSucesso += CadUsuario_SalvoComSucesso;
+                cadUsuarioCtrl.ErroOcorreu += CadUsuario_ErroOcorreu;
+                phCadastroUsuario.Controls.Add(cadUsuarioCtrl);
+                RegistrarControleAsyncPostBackUsuario();
+            }
+            else
+            {
+                cadUsuarioCtrl = (CadastroUsuario)phCadastroUsuario.FindControl("cadUsuario");
+                cadUsuarioCtrl.SalvoComSucesso -= CadUsuario_SalvoComSucesso;
+                cadUsuarioCtrl.SalvoComSucesso += CadUsuario_SalvoComSucesso;
+                cadUsuarioCtrl.ErroOcorreu -= CadUsuario_ErroOcorreu;
+                cadUsuarioCtrl.ErroOcorreu += CadUsuario_ErroOcorreu;
+                RegistrarControleAsyncPostBackUsuario();
+            }
+        }
+
+        private void EnsureCadastroUnidadeControlIsLoaded()
+        {
+            if (phCadastroUnidade.FindControl("cadUnidade") == null)
+            {
+                cadUnidadeCtrl = (CadastroUnidade)LoadControl("~/Controls/CadastroUnidade.ascx");
+                cadUnidadeCtrl.ID = "cadUnidade";
+                cadUnidadeCtrl.UnidadeSalvaComSucesso += CadUnidade_SalvaComSucesso;
+                cadUnidadeCtrl.ErroAoSalvarUnidade += CadUnidade_ErroAoSalvar;
+                phCadastroUnidade.Controls.Add(cadUnidadeCtrl);
+                RegistrarControleAsyncPostBackUnidade();
+            }
+            else
+            {
+                cadUnidadeCtrl = (CadastroUnidade)phCadastroUnidade.FindControl("cadUnidade");
+                cadUnidadeCtrl.UnidadeSalvaComSucesso -= CadUnidade_SalvaComSucesso;
+                cadUnidadeCtrl.UnidadeSalvaComSucesso += CadUnidade_SalvaComSucesso;
+                cadUnidadeCtrl.ErroAoSalvarUnidade -= CadUnidade_ErroAoSalvar;
+                cadUnidadeCtrl.ErroAoSalvarUnidade += CadUnidade_ErroAoSalvar;
+                RegistrarControleAsyncPostBackUnidade();
+            }
+        }
+
+        private void RegistrarControleAsyncPostBackUsuario()
+        {
+            if (cadUsuarioCtrl != null)
+            {
+                if (cadUsuarioCtrl.FindControl("btnSalvar") is Button btnSalvarUsuario)
+                {
+                    ScriptManager.GetCurrent(this).RegisterAsyncPostBackControl(btnSalvarUsuario);
+                }
+            }
+        }
+        private void RegistrarControleAsyncPostBackUnidade()
+        {
+            if (cadUnidadeCtrl != null)
+            {
+                if (cadUnidadeCtrl.FindControl("btnSalvarUnidade") is Button btnSalvarUnidade)
+                {
+                    ScriptManager.GetCurrent(this).RegisterAsyncPostBackControl(btnSalvarUnidade);
+                }
+            }
+        }
+
+        protected void btnAbrirModalNovoUsuario_Click(object sender, EventArgs e)
+        {
+            EnsureCadastroUsuarioControlIsLoaded();
+            if (cadUsuarioCtrl != null)
+            {
+                cadUsuarioCtrl.InicializarParaNovoUsuario();
+                litModalTitle.Text = "Novo Usuário";
+                lblModalErrorMessage.Visible = false;
+                updCadastro.Update();
+                ScriptManager.RegisterStartupScript(
+                    updCadastro,
+                    updCadastro.GetType(),
+                    "AbrirModalNovoUsuario",
+                    "window.shouldOpenModalCadastro = true;",
+                    addScriptTags: true
+                );
+            }
+        }
+
+        protected void CadUsuario_SalvoComSucesso(object sender, EventArgs e)
+        {
+            CarregarUsuarios();
+            ScriptManager.RegisterStartupScript(
+                this,
+                GetType(),
+                "UsuarioSalvoEFecharModal",
+                "alert('Usuário salvo com sucesso!'); window.shouldCloseModalCadastro = true;",
+                addScriptTags: true
+            );
+            updCadastro.Update();
+        }
+
+        protected void CadUsuario_ErroOcorreu(object sender, Exception ex)
+        {
+            EnsureCadastroUsuarioControlIsLoaded();
+            lblModalErrorMessage.Text = "Erro: " + ex.Message;
+            lblModalErrorMessage.Visible = true;
+
+            Session["AbrirModalUsuario"] = true;
+            updCadastro.Update();
         }
 
         protected void gvUsuarios_RowCommand(object sender, GridViewCommandEventArgs e)
         {
+            int id = Convert.ToInt32(e.CommandArgument);
             if (e.CommandName == "Excluir")
             {
-                int id = Convert.ToInt32(e.CommandArgument);
                 UsuarioDAL dal = new UsuarioDAL();
                 dal.Excluir(id);
                 CarregarUsuarios();
+            }
+            else if (e.CommandName == "Editar")
+            {
+                EnsureCadastroUsuarioControlIsLoaded();
+                cadUsuarioCtrl.CarregarUsuarioParaEdicao(id);
+                litModalTitle.Text = "Editar Usuário";
+                lblModalErrorMessage.Visible = false;
+                updCadastro.Update();
+                ScriptManager.RegisterStartupScript(
+                    updCadastro,
+                    updCadastro.GetType(),
+                    "AbrirModalEdicaoUsuario",
+                    "window.shouldOpenModalCadastro = true;",
+                    addScriptTags: true
+                );
             }
         }
 
@@ -160,7 +282,7 @@ namespace Projeto1
             Usuario usuario = (Usuario)Session["UsuarioLogado"];
             UsuarioDAL dal = new UsuarioDAL();
 
-            if (usuario == null) 
+            if (usuario == null)
             {
                 lblMensagemSenha.Text = "Sua sessão expirou. Por favor, faça login novamente.";
                 return;
@@ -188,6 +310,110 @@ namespace Projeto1
             txtConfirmarSenha.Text = "";
         }
 
+        protected void btnAbrirModalNovaUnidade_Click(object sender, EventArgs e)
+        {
+            EnsureCadastroUnidadeControlIsLoaded();
+            if (cadUnidadeCtrl != null)
+            {
+                cadUnidadeCtrl.InicializarParaNovaUnidade();
+                litModalUnidadeTitle.Text = "Nova Unidade";
+                updUnidade.Update();
+                ScriptManager.RegisterStartupScript(
+                    updUnidade,
+                    updUnidade.GetType(),
+                    "AbrirModalNovaUnidade",
+                    "window.shouldOpenModalUnidade = true;",
+                    addScriptTags: true
+                );
+            }
+        }
+
+        protected void btnGerenciarUnidades_Click(object sender, EventArgs e)
+        {
+            CarregarUnidadesGrid();
+            updGerenciarUnidades.Update();
+            ScriptManager.RegisterStartupScript(
+                this,
+                this.GetType(),
+                "AbrirModalGerenciarUnidades",
+                "window.shouldOpenModalGerenciarUnidades = true;",
+                addScriptTags: true
+            );
+        }
+
+        private void CarregarUnidadesGrid()
+        {
+            gvUnidades.DataSource = _unidadeDAL.ObterTodas();
+            gvUnidades.DataBind();
+        }
+
+        protected void gvUnidades_RowCommand(object sender, GridViewCommandEventArgs e)
+        {
+            int unidadeId = Convert.ToInt32(e.CommandArgument);
+            if (e.CommandName == "EditarUnidade")
+            {
+                EnsureCadastroUnidadeControlIsLoaded();
+                cadUnidadeCtrl.CarregarUnidadeParaEdicao(unidadeId);
+                litModalUnidadeTitle.Text = "Editar Unidade";
+                updUnidade.Update();
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    this.GetType(),
+                    "AbrirModalEdicaoUnidade",
+                    "$('#modalGerenciarUnidades').modal('hide'); " + 
+                    "$('#modalUnidade').modal('show');",             
+                    true
+                );
+            }
+            else if (e.CommandName == "ExcluirUnidade")
+            {
+                try
+                {
+                    _unidadeDAL.Excluir(unidadeId);
+                    CarregarUnidadesGrid();
+                    updGerenciarUnidades.Update();
+
+                    if (phCadastroUsuario.FindControl("cadUsuario") != null)
+                    {
+                        cadUsuarioCtrl = (CadastroUsuario)phCadastroUsuario.FindControl("cadUsuario");
+                        cadUsuarioCtrl.AtualizarListaDeUnidades();
+                        updCadastro.Update();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ScriptManager.RegisterClientScriptBlock(
+                        this,
+                        this.GetType(),
+                        "alert",
+                        $"alert('Erro ao excluir unidade: {ex.Message.Replace("'", "\\'")}');",
+                        true
+                    );
+                }
+            }
+        }
+
+        protected void CadUnidade_SalvaComSucesso(object sender, EventArgs e)
+        {
+            ScriptManager.RegisterStartupScript(
+                this,
+                GetType(),
+                "FecharModalSucesso",
+                "fecharModalUnidade();",
+                true
+            );
+        }
+
+        protected void CadUnidade_ErroAoSalvar(object sender, string errorMessage)
+        {
+            ScriptManager.RegisterStartupScript(
+                this,
+                GetType(),
+                "ManterModalAberto",
+                "manterModalUnidadeAberto();",
+                true
+            );
+        }
 
         private string FormatCPF(string cpf)
         {
@@ -195,7 +421,7 @@ namespace Projeto1
             string cpfNumerico = new string(cpf.Where(char.IsDigit).ToArray());
             if (cpfNumerico.Length == 11)
                 return Convert.ToUInt64(cpfNumerico).ToString(@"000\.000\.000\-00");
-            return cpf; 
+            return cpf;
         }
 
         [System.Web.Services.WebMethod]

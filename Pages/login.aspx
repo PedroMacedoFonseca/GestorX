@@ -7,45 +7,7 @@
     <title>Login - Sistema</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css"/>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f5f5f5;
-            background-image: url('../Images/bg.png');
-            background-size: cover;
-            background-position: center;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .login-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 2.5rem;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-        
-        .form-control {
-            border-radius: 6px;
-            padding: 0.7rem;
-        }
-        
-        .btn-login {
-            width: 100%;
-            padding: 0.8rem;
-            border-radius: 6px;
-            font-weight: 500;
-        }
-        
-        .error-message {
-            color: #dc3545;
-            margin-top: 1rem;
-        }
-    </style>
+    <link rel="stylesheet" href="../CSS/login.css" />
 </head>
 <body>
     <form id="form1" runat="server" class="login-container">

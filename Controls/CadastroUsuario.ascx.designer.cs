@@ -105,13 +105,13 @@ namespace Projeto1.Controls
         protected global::System.Web.UI.WebControls.TextBox txtTelefone;
 
         /// <summary>
-        /// Controle txtUnidade.
+        /// Controle ddlUnidade.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtUnidade;
+        protected global::System.Web.UI.WebControls.DropDownList ddlUnidade;
 
         /// <summary>
         /// Controle rfvUnidade.
@@ -177,12 +177,12 @@ namespace Projeto1.Controls
         protected global::System.Web.UI.WebControls.Button btnSalvar;
 
         /// <summary>
-        /// Controle lblDebug.
+        /// Controle lblMensagemErroControle.
         /// </summary>
         /// <remarks>
         /// Campo gerado automaticamente.
         /// Para modificar, mova a declaração de campo do arquivo de designer a um arquivo code-behind.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblDebug;
+        protected global::System.Web.UI.WebControls.Label lblMensagemErroControle;
     }
 }

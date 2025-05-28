@@ -34,7 +34,7 @@
                     ErrorMessage="CPF já cadastrado"
                     Display="Dynamic"
                     CssClass="text-danger small"
-                    ValidateEmptyText="true"
+                    ValidateEmptyText="false"
                     ValidationGroup="vgCadastro" />
             </div>
         </div>
@@ -56,8 +56,11 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Unidade *</label>
-                <asp:TextBox ID="txtUnidade" runat="server" CssClass="form-control"></asp:TextBox>
-                <asp:RequiredFieldValidator ID="rfvUnidade" runat="server" ControlToValidate="txtUnidade"
+                <asp:DropDownList ID="ddlUnidade" runat="server" CssClass="form-select"
+                    DataTextField="Nome" DataValueField="UnidadeID">
+                </asp:DropDownList>
+                <asp:RequiredFieldValidator ID="rfvUnidade" runat="server" ControlToValidate="ddlUnidade"
+                    InitialValue="" 
                     ErrorMessage="Campo obrigatório" ValidationGroup="vgCadastro" Display="Dynamic" CssClass="text-danger small"></asp:RequiredFieldValidator>
             </div>
         
@@ -100,10 +103,9 @@
                 CssClass="btn btn-primary"
                 OnClick="btnSalvar_Click"
                 ValidationGroup="vgCadastro"
-                OnClientClick="if (!Page_ClientValidate('vgCadastro')) { return false; } else { $(this).prop('disabled', true); }"
                 UseSubmitBehavior="false" />
-            <asp:Label ID="lblDebug" runat="server" CssClass="text-info small" />
         </div>
+        <asp:Label ID="lblMensagemErroControle" runat="server" CssClass="text-danger small mt-2 d-block"></asp:Label>
 
 <script type="text/javascript">
     function usarMatriculaComoSenha() {
@@ -166,5 +168,18 @@
         return digit2 === parseInt(cpf.charAt(10));
     }
 
+    function toggleSenha() {
+        const senhaField = document.getElementById('<%= txtSenha.ClientID %>');
+        const icone = document.getElementById('iconeSenha');
+        if (senhaField.type === "password") {
+            senhaField.type = "text";
+            icone.classList.remove('bi-eye');
+            icone.classList.add('bi-eye-slash');
+        } else {
+            senhaField.type = "password";
+            icone.classList.remove('bi-eye-slash');
+            icone.classList.add('bi-eye');
+        }
+    }
 
 </script>

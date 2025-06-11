@@ -4,7 +4,7 @@
 
 ## 🧩 Visão Geral
 
-O **CorpGestor** é um sistema web desenvolvido com ASP.NET Web Forms, voltado para o cadastro e gerenciamento de pessoas em diferentes tipos de organização. Ideal para projetos que exigem controle de acesso, segmentação por perfil e associação com unidades ou setores.
+O **Gestor X** é um sistema web desenvolvido com ASP.NET Web Forms, voltado para o cadastro e gerenciamento de pessoas em diferentes tipos de organização. Ideal para projetos que exigem controle de acesso, segmentação por perfil e associação com unidades ou setores.
 
 ## 🔐 Segurança
 

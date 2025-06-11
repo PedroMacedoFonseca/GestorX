@@ -220,14 +220,22 @@ namespace Projeto1
         protected void CadUsuario_SalvoComSucesso(object sender, EventArgs e)
         {
             CarregarUsuarios();
+            updCadastro.Update();
+            string script = @"
+                $('#modalCadastro').modal('hide');
+                $('.modal-backdrop').remove();
+            ";
             ScriptManager.RegisterStartupScript(
-                this,
-                GetType(),
-                "UsuarioSalvoEFecharModal",
-                "alert('Usuário salvo com sucesso!'); window.shouldCloseModalCadastro = true;",
+                updCadastro, 
+                updCadastro.GetType(),
+                "FecharModalCadastro",
+                script,
                 addScriptTags: true
             );
-            updCadastro.Update();
+            if (pnlAdmin.Visible) 
+            {
+                pnlAdmin.Update(); 
+            }
         }
 
         protected void CadUsuario_ErroOcorreu(object sender, Exception ex)
@@ -235,9 +243,15 @@ namespace Projeto1
             EnsureCadastroUsuarioControlIsLoaded();
             lblModalErrorMessage.Text = "Erro: " + ex.Message;
             lblModalErrorMessage.Visible = true;
+            updCadastro.Update(); 
 
-            Session["AbrirModalUsuario"] = true;
-            updCadastro.Update();
+            ScriptManager.RegisterStartupScript(
+                updCadastro,
+                updCadastro.GetType(),
+                "ReabrirModalUsuarioErro",
+                "window.shouldOpenModalCadastro = true;", 
+                addScriptTags: true
+            );
         }
 
         protected void gvUsuarios_RowCommand(object sender, GridViewCommandEventArgs e)
@@ -384,22 +398,29 @@ namespace Projeto1
 
         protected void CadUnidade_SalvaComSucesso(object sender, EventArgs e)
         {
+            CarregarUnidadesGrid();
+            updGerenciarUnidades.Update();
+
+            string script = @"
+                $('#modalUnidade').modal('hide');
+                $('.modal-backdrop').remove();
+            ";
             ScriptManager.RegisterStartupScript(
                 this,
-                GetType(),
-                "FecharModalSucesso",
-                "fecharModalUnidade();",
-                true
+                this.GetType(),
+                "FecharModalUnidade",
+                script,
+                addScriptTags: true
             );
         }
 
         protected void CadUnidade_ErroAoSalvar(object sender, string errorMessage)
         {
             ScriptManager.RegisterStartupScript(
-                this,
-                GetType(),
-                "ManterModalAberto",
-                "manterModalUnidadeAberto();",
+                this, 
+                this.GetType(),
+                "ManterModalUnidadeAbertoPorErro",
+                "window.reopenModalUnidadeOnError = true;", 
                 true
             );
         }

@@ -7,59 +7,60 @@
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 <div class="container mt-4">
-        <asp:Panel ID="pnlAdmin" runat="server" Visible="false">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0"><i class="bi bi-people-fill"></i> Gerenciamento de Usuários</h4>
-                </div>
-                <div class="card-body">
-                    <asp:LinkButton ID="btnAbrirModalNovoAsp" runat="server" CssClass="btn btn-success" OnClick="btnAbrirModalNovoUsuario_Click">
-                        <i class="bi bi-plus-circle"></i> Novo Usuário
-                    </asp:LinkButton>
-                    
-                    <asp:LinkButton ID="btnAbrirModalNovaUnidade" runat="server" CssClass="btn btn-info ms-2" OnClick="btnAbrirModalNovaUnidade_Click">
-                        <i class="bi bi-building-add"></i> Cadastrar Unidade
-                    </asp:LinkButton>
-                    <asp:LinkButton ID="btnGerenciarUnidades" runat="server" CssClass="btn btn-secondary ms-2" OnClick="btnGerenciarUnidades_Click">
-                        <i class="bi bi-pencil-square"></i> Gerenciar Unidades
-                    </asp:LinkButton>
+        <asp:UpdatePanel ID="pnlAdmin" runat="server" UpdateMode="Conditional" Visible="false">
+            <ContentTemplate>
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0"><i class="bi bi-people-fill"></i> Gerenciamento de Usuários</h4>
+                    </div>
+                    <div class="card-body">
+                        <asp:LinkButton ID="btnAbrirModalNovoAsp" runat="server" CssClass="btn btn-success" OnClick="btnAbrirModalNovoUsuario_Click">
+                            <i class="bi bi-plus-circle"></i> Novo Usuário
+                        </asp:LinkButton>
+                
+                        <asp:LinkButton ID="btnAbrirModalNovaUnidade" runat="server" CssClass="btn btn-info ms-2" OnClick="btnAbrirModalNovaUnidade_Click">
+                            <i class="bi bi-building-add"></i> Cadastrar Unidade
+                        </asp:LinkButton>
+                        <asp:LinkButton ID="btnGerenciarUnidades" runat="server" CssClass="btn btn-secondary ms-2" OnClick="btnGerenciarUnidades_Click">
+                            <i class="bi bi-pencil-square"></i> Gerenciar Unidades
+                        </asp:LinkButton>
 
-
-                    <div class="table-responsive mt-3">
-                        <asp:GridView ID="gvUsuarios" runat="server" AutoGenerateColumns="False"
-                            CssClass="table table-striped table-hover" DataKeyNames="ID"
-                            OnRowCommand="gvUsuarios_RowCommand" EmptyDataText="Nenhum usuário cadastrado.">
-                            <Columns>
-                                <asp:BoundField DataField="ID" HeaderText="ID" />
-                                <asp:BoundField DataField="NomeCompleto" HeaderText="Nome Completo" />
-                                <asp:BoundField DataField="CPF" HeaderText="CPF" />
-                                <asp:BoundField DataField="NomeUnidade" HeaderText="Unidade" />
-                                <asp:BoundField DataField="Perfil" HeaderText="Perfil" />
-                                <asp:BoundField DataField="DataCadastro" HeaderText="Cadastrado em" 
-                                    DataFormatString="{0:dd/MM/yyyy HH:mm}" />
-                                <asp:TemplateField HeaderText="Ações">
-                                    <ItemTemplate>
-                                        <asp:LinkButton
-                                            runat="server"
-                                            CommandName="Editar"
-                                            CommandArgument='<%# Eval("ID") %>'
-                                            CssClass="btn btn-sm btn-outline-primary"
-                                            ToolTip="Editar">
-                                          <i class="bi bi-pencil"></i> Editar
-                                        </asp:LinkButton>
-                                        <asp:LinkButton runat="server" CommandName="Excluir" CommandArgument='<%# Eval("ID") %>'
-                                            CssClass="btn btn-sm btn-outline-danger ms-1" ToolTip="Excluir"
-                                            OnClientClick="return confirm('Tem certeza que deseja excluir este usuário?');">
-                                            <i class="bi bi-trash"></i>
-                                        </asp:LinkButton>
-                                    </ItemTemplate>
-                                </asp:TemplateField>
-                            </Columns>
-                        </asp:GridView>
+                        <div class="table-responsive mt-3">
+                            <asp:GridView ID="gvUsuarios" runat="server" AutoGenerateColumns="False"
+                                CssClass="table table-striped table-hover" DataKeyNames="ID"
+                                OnRowCommand="gvUsuarios_RowCommand" EmptyDataText="Nenhum usuário cadastrado.">
+                                <Columns>
+                                    <asp:BoundField DataField="ID" HeaderText="ID" />
+                                    <asp:BoundField DataField="NomeCompleto" HeaderText="Nome Completo" />
+                                    <asp:BoundField DataField="CPF" HeaderText="CPF" />
+                                    <asp:BoundField DataField="NomeUnidade" HeaderText="Unidade" />
+                                    <asp:BoundField DataField="Perfil" HeaderText="Perfil" />
+                                    <asp:BoundField DataField="DataCadastro" HeaderText="Cadastrado em" 
+                                        DataFormatString="{0:dd/MM/yyyy HH:mm}" />
+                                    <asp:TemplateField HeaderText="Ações">
+                                        <ItemTemplate>
+                                            <asp:LinkButton
+                                                runat="server"
+                                                CommandName="Editar"
+                                                CommandArgument='<%# Eval("ID") %>'
+                                                CssClass="btn btn-sm btn-outline-primary"
+                                                ToolTip="Editar">
+                                                <i class="bi bi-pencil"></i> Editar
+                                            </asp:LinkButton>
+                                            <asp:LinkButton runat="server" CommandName="Excluir" CommandArgument='<%# Eval("ID") %>'
+                                                CssClass="btn btn-sm btn-outline-danger ms-1" ToolTip="Excluir"
+                                                OnClientClick="return confirm('Tem certeza que deseja excluir este usuário?');">
+                                                <i class="bi bi-trash"></i>
+                                            </asp:LinkButton>
+                                        </ItemTemplate>
+                                    </asp:TemplateField>
+                                </Columns>
+                            </asp:GridView>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </asp:Panel>
+            </ContentTemplate>
+        </asp:UpdatePanel>
         
         <asp:Panel ID="pnlColaborador" runat="server" Visible="false">
             <div class="row">

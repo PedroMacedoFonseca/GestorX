@@ -112,7 +112,7 @@ namespace Projeto1.DAL
         {
             using (var conn = new SqlConnection(connectionString))
             {
-                var cmd = new SqlCommand("UPDATE Unidades SET Ativo = 0 WHERE UnidadeID = @UnidadeID", conn);
+                var cmd = new SqlCommand("DELETE FROM Unidades WHERE UnidadeID = @UnidadeID", conn);
                 cmd.Parameters.AddWithValue("@UnidadeID", unidadeId);
                 conn.Open();
                 cmd.ExecuteNonQuery();

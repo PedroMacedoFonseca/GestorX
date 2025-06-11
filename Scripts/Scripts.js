@@ -1,34 +1,40 @@
 ﻿import { ModalManager } from './Core/Modals.js';
-import './Core/Masks.js';
-import './Core/Validators.js';
-import './Inicio.js';  
+import './Core/Masks.js';      
+import './Core/Validators.js'; 
+import { setupGlobalModalActions, initializePageModals } from './Inicio.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+function checkAndOpenModalsFromFlags() {
     if (window.shouldOpenModalCadastro) {
-        abrirModalUsuario();
+        ModalManager.show('modalCadastro'); 
         delete window.shouldOpenModalCadastro;
     }
     if (window.shouldOpenModalUnidade) {
-        abrirModalUnidade();
+        ModalManager.show('modalUnidade');
         delete window.shouldOpenModalUnidade;
     }
     if (window.shouldOpenModalGerenciarUnidades) {
-        abrirModalGerenciarUnidades();
+        ModalManager.show('modalGerenciarUnidades');
         delete window.shouldOpenModalGerenciarUnidades;
     }
-});
-
-function manterModalUnidadeAberto() {
-    $('#modalUnidade').modal('show');
 }
 
-function fecharModalUnidade() {
-    $('#modalUnidade').modal('hide');
-}
+function onPageReady() {
+    initializePageModals();          
+    checkAndOpenModalsFromFlags(); 
 
-Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
-    var errorPanel = document.getElementById('<%= ((CadastroUnidade)phCadastroUnidade.FindControl("cadUnidade")).pnlValidation.ClientID %>');
-    if (errorPanel && errorPanel.style.display !== 'none') {
-        $('#modalUnidade').modal('show');
+    if (window.reopenModalUnidadeOnError) { 
+        ModalManager.show('modalUnidade');
+        delete window.reopenModalUnidadeOnError;
     }
+}
+
+document.addEventListener('DOMContentLoaded', () => {;
+    setupGlobalModalActions(); 
+    onPageReady();             
 });
+
+if (typeof Sys !== 'undefined' && Sys.WebForms && Sys.WebForms.PageRequestManager) {
+    Sys.WebForms.PageRequestManager.getInstance().add_pageLoaded((sender, args) => {
+        onPageReady();
+    });
+} 

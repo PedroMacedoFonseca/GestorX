@@ -1,19 +1,16 @@
 ﻿import { ModalManager } from './Core/Modals.js';
 
-window.abrirModalUsuario = () => ModalManager.show('modalCadastro');
-window.abrirModalUnidade = () => ModalManager.show('modalUnidade');
-window.abrirModalGerenciarUnidades = () => ModalManager.show('modalGerenciarUnidades');
+export function setupGlobalModalActions() {
+    window.abrirModalUsuario = () => ModalManager.show('modalCadastro');
+    window.abrirModalUnidade = () => ModalManager.show('modalUnidade');
+    window.abrirModalGerenciarUnidades = () => ModalManager.show('modalGerenciarUnidades');
 
-function initializeModals() {
+    window.manterModalUnidadeAbertoGlobal = () => ModalManager.show('modalUnidade');
+    window.fecharModalUnidadeGlobal = () => ModalManager.hide('modalUnidade');
+}
+
+export function initializePageModals() {
     ModalManager.init('modalCadastro', { keyboard: false, backdrop: 'static' });
     ModalManager.init('modalUnidade');
     ModalManager.init('modalGerenciarUnidades');
-}
-
-document.addEventListener('DOMContentLoaded', initializeModals);
-
-if (typeof Sys !== 'undefined') {
-    Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
-        initializeModals();
-    });
 }

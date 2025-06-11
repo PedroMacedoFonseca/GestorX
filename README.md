@@ -1,4 +1,4 @@
-# CorpGestor
+# Gestor X
 
 **Sistema genérico de cadastro e gestão de pessoas com autenticação segura, controle por perfil e unidades de atuação.**
 
